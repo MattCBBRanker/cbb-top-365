@@ -1,0 +1,327 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CBB Top 365 | College Basketball Analytics</title><style>
+:root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#e9f0fa;background:#080e1a}*{box-sizing:border-box}body{margin:0}header{border-bottom:1px solid #26344b;background:#101a2a;padding:18px max(20px,calc((100vw - 1200px)/2));display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.brand{font-weight:900;font-size:22px;letter-spacing:-.7px}.brand span{color:#62b2ff}nav{display:flex;gap:8px;flex-wrap:wrap}button,.btn{background:#1b2b42;color:#e9f0fa;border:1px solid #31435e;padding:10px 14px;border-radius:9px;cursor:pointer;font:inherit}button:hover,.btn:hover{background:#274264}button.active{background:#1671c5;border-color:#4da8ff}main{max-width:1200px;margin:0 auto;padding:28px 20px 60px}.eyebrow{font-size:12px;letter-spacing:2px;color:#65b5ff;font-weight:800}h1{font-size:clamp(28px,5vw,44px);margin:8px 0}p{color:#a6b8d0;line-height:1.55}.hero{background:linear-gradient(110deg,#172c4c,#0d1728);border:1px solid #294568;padding:28px;border-radius:16px;margin-bottom:22px}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:22px}.metric,.panel{background:#111d2e;border:1px solid #263b55;border-radius:13px;padding:18px}.metric small{display:block;color:#9db1ca;margin-bottom:7px}.metric strong{font-size:26px}.panel{margin-top:16px}.panel h2{margin:0 0 14px;font-size:20px}.controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}input,select{background:#0a1525;color:#eaf2ff;border:1px solid #3b516c;border-radius:9px;padding:11px;font:inherit}input[type=search]{flex:1;min-width:200px}input[type=url]{width:100%;margin:8px 0}.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;white-space:nowrap;font-size:14px}th,td{text-align:left;padding:12px;border-bottom:1px solid #26364d}th{color:#9bb0cb;font-size:12px;cursor:pointer;user-select:none}th:hover{color:#fff}td.num,th.num{text-align:right}tbody tr:hover{background:#1b2d45}.teamlink{background:none;border:0;padding:0;color:#b9dcff;font-weight:750}.pill{display:inline-block;border-radius:6px;padding:4px 8px;background:#183a57;color:#8ed1ff;font-size:12px}.muted{color:#8ca2bd}.hide{display:none}.profilegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.profilegrid .metric{padding:14px}.profilegrid strong{font-size:22px}.back{margin-bottom:16px}.chart{display:flex;align-items:end;gap:8px;height:180px;padding-top:12px}.bar{flex:1;background:linear-gradient(#54aaff,#19538c);min-height:3px;border-radius:5px 5px 0 0;position:relative}.bar span{position:absolute;bottom:-25px;left:50%;transform:translateX(-50%);font-size:11px;color:#8ea7c5}.note{font-size:13px;color:#8ca2bd}.status{font-size:13px;color:#8fdbbb}footer{padding:24px;text-align:center;color:#8093ae;border-top:1px solid #22354d}@media(max-width:700px){.metrics{grid-template-columns:repeat(2,1fr)}.profilegrid{grid-template-columns:repeat(2,1fr)}header{padding:16px 20px}}
+
+/* Team colors apply to the entire ranking row. */
+#rows tr.team-colored > td{background:var(--team-bg);color:var(--team-fg);border-bottom-color:rgba(255,255,255,.17)}
+#rows tr.team-colored:hover > td{filter:brightness(1.13)}
+#rows tr.team-colored .teamlink{color:var(--team-fg);text-decoration:underline;text-decoration-color:transparent}
+#rows tr.team-colored .teamlink:hover{text-decoration-color:currentColor}
+
+/* Conference standings: same look and team colors as rankings */
+#standings-tables{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,480px),1fr));gap:16px;align-items:start}
+#standings-tables .panel{margin:0;min-width:0}
+#standings-tables .panel h2{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#standings-tables .tablewrap{max-width:100%}
+#standings-tables th,#standings-tables td{padding:9px 8px}
+#standings-tables th{cursor:default}
+#standings-tables .team-logo,#standings-tables .team-logo-fallback{width:25px;height:25px}
+#standings-tables .standings-team{display:flex;align-items:center;gap:8px;font-weight:700;min-width:145px}
+#standings-tables tr.team-colored td{background:var(--team-bg);color:var(--team-fg);border-bottom-color:rgba(255,255,255,.17)}
+#standings-tables tr.team-colored:hover td{filter:brightness(1.12)}
+#standings-tables .num{font-variant-numeric:tabular-nums}
+/* Team logos */
+.teamlink{display:inline-flex;align-items:center;gap:10px;text-align:left}
+.team-logo{width:34px;height:34px;object-fit:contain;flex:none;vertical-align:middle;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
+.team-logo-fallback{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;flex:none;border-radius:50%;background:rgba(255,255,255,.20);color:inherit;font-size:11px;font-weight:800;border:1px solid rgba(255,255,255,.35)}
+.profile-logo{width:92px;height:92px;object-fit:contain;vertical-align:middle;margin-right:16px;filter:drop-shadow(0 3px 5px rgba(0,0,0,.35))}
+.profile-logo-fallback{display:inline-flex;align-items:center;justify-content:center;width:92px;height:92px;border-radius:50%;background:#274264;margin-right:16px;font-size:22px;font-weight:800}
+.profile-title{display:flex;align-items:center;gap:2px;flex-wrap:wrap}
+
+/* Box scores */
+#scores-games{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,350px),1fr));gap:14px}
+#scores-games .panel{margin:0} .score-team{display:flex;align-items:center;gap:9px;padding:10px 4px;min-width:0}
+.score-team .score-name{flex:1;min-width:0;font-weight:750}.score-team .score-value{font-size:25px;font-weight:850;font-variant-numeric:tabular-nums}
+.score-rank{font-size:12px;font-weight:850;background:#315376;border:1px solid #6383a3;border-radius:5px;padding:3px 5px;flex:none}
+.score-meta{font-size:12px;color:#9bb0cb}.score-card-action{margin-top:10px;width:100%}
+#scores-detail .panel{margin:16px 0}#scores-detail table{font-size:12px}#scores-detail th,#scores-detail td{padding:9px 7px}
+</style></head><body><header><div class="brand">CBB <span>TOP 365</span></div><nav><button id="nav-rank" class="active">Rankings</button><button id="nav-standings">Standings</button><button id="nav-scores">Box Scores</button><button id="nav-method">Methodology</button><button id="nav-data">Data Settings</button></nav></header><main>
+<section id="rank"><div class="hero"><div class="eyebrow">2026–27 · INDEPENDENT ANALYTICS</div><h1>National Team Rankings</h1><p>Every Division I team. One transparent rating. Sort, search, and explore team profiles powered by your own spreadsheet.</p><span class="pill" id="source-badge">Demo data — connect your sheet</span></div><div class="metrics"><div class="metric"><small>Teams loaded</small><strong id="total">—</strong></div><div class="metric"><small>Highest rating</small><strong id="high">—</strong></div><div class="metric"><small>Average rating</small><strong id="average">—</strong></div><div class="metric"><small>Games represented</small><strong id="games">—</strong></div></div><div class="panel"><h2>Rankings Dashboard</h2><div class="controls"><input type="search" id="search" placeholder="Search any team…"><select id="filter"><option value="all">All teams</option><option value="winning">Winning records</option><option value="q1">At least one Quad 1 win</option></select><button id="export">Export CSV</button></div><div class="tablewrap"><table><thead><tr id="head"></tr></thead><tbody id="rows"></tbody></table></div><p class="note" id="count"></p><p class="note" id="logo-coverage"></p></div></section>
+<section id="standings" class="hide"><div class="hero"><div class="eyebrow">2026–27 · NCAA DIVISION I MEN</div><h1>Conference Standings</h1><p>Automatic conference standings with the same CBB Top 365 team colors and logos. Records are sourced separately from your custom rankings.</p><span class="pill" id="standings-status">Not loaded yet</span></div><div class="controls"><button id="standings-refresh">↻ Refresh standings</button><input type="search" id="standings-search" placeholder="Find a team or conference…" aria-label="Find team or conference"></div><p class="note" id="standings-updated"></p><div id="standings-tables"><div class="panel"><p>Open this tab to load the latest available conference standings.</p></div></div></section>
+<section id="scores" class="hide"><div class="hero"><div class="eyebrow">2026–27 · NCAA DIVISION I MEN</div><h1>Scores & Box Scores</h1><p>Game results and player stats from ESPN, with your independent CBB Top 365 rankings from Google Sheets.</p><span class="pill" id="scores-status">Choose a date to see games</span></div><div class="controls"><input id="scores-date" type="date" aria-label="Game date"><button id="scores-refresh">↻ Refresh games</button><button id="scores-today">Today</button></div><p class="note"># rankings are your CBB Top 365 rankings, not the AP or ESPN Top 25. Unmatched teams display without a rank.</p><div id="scores-games"><div class="panel"><p>Select a date to load games.</p></div></div><div id="scores-detail" class="hide"></div></section>
+<section id="profile" class="hide"><button class="back" id="back">← Back to rankings</button><div class="hero"><div class="eyebrow" id="pr-rank"></div><div class="profile-title"><span id="pr-logo"></span><h1 id="pr-name"></h1></div><p id="pr-summary"></p></div><div class="profilegrid" id="pr-metrics"></div><div class="panel"><h2>Rating Breakdown</h2><div id="breakdown"></div><p class="note">Components reproduce your Google Sheets rating formula. Offense and defense use EvanMiya ratings; schedule, luck, and tempo use KenPom inputs.</p></div><div class="panel"><h2>Résumé</h2><div id="resume"></div></div></section>
+<section id="method" class="hide"><div class="hero"><div class="eyebrow">OPEN METHODOLOGY</div><h1>How CBB Top 365 works</h1><p>Ratings currently use your original custom weighted formula, without recalibration. Higher scores rank higher.</p></div><div class="panel"><h2>Current rating formula</h2><p style="overflow-wrap:anywhere;color:#eaf2ff;font-family:monospace">2.7×Off + 3.3×Def + 12×(W−L)/max(1,W+L) + 2×SOS − 10×Luck − (Tempo−71.6)²/25 + 2×Q1W + 0.75×Q2W − 2×Q3L − 3×Q4L + 0.5×RoadW</p><p>Both EvanMiya offensive and defensive ratings are assumed to be better when higher. KenPom SOS is assumed to increase for harder schedules, and luck is assumed to be expressed as a decimal. Confirm the direction and scale of each imported statistic before interpreting the ratings.</p><p>These weights are experimental. They are not validated game prediction probabilities. Future work should test historical out-of-sample prediction accuracy and account for overlap between strength of schedule, Quad wins, and road wins.</p></div></section>
+<section id="data" class="hide"><div class="hero"><div class="eyebrow">DATA CONNECTION</div><h1>Connect Google Sheets</h1><p>Publish your rankings tab as CSV, paste its public CSV URL below, and load it. The website reads columns A–N in your existing order. Never publish private information in this sheet.</p></div><div class="panel"><h2>Spreadsheet CSV URL</h2><input type="url" id="sheeturl" placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv"><div class="controls"><button id="save">Save & load</button><button id="reset">Use demo data</button><button id="refresh">Refresh</button></div><p id="loadstatus" class="status"></p><button id="missing-logos">Download unmatched logo names</button><p class="note">In Google Sheets: File → Share → Publish to web → choose the rankings sheet → Comma-separated values (.csv) → Publish. If your browser blocks access, use a public CSV file hosted alongside this website instead. Your CSV must have the first 14 columns: Team, Rating, Wins, Losses, Offense, Defense, SOS, Luck, Tempo, Q1 Wins, Q2 Wins, Q3 Losses, Q4 Losses, Road Wins.</p></div></section>
+</main><footer>CBB Top 365 · Independent college basketball analytics · Not affiliated with the NCAA, KenPom, or EvanMiya</footer><script>
+
+// Team colors extracted from the user's Rankings worksheet.
+const teamColors = {"davidson":{"background":"#AC1A2F","text":"#FFFFFF"},"dayton":{"background":"#CE1141","text":"#FFFFFF"},"duquense":{"background":"#041E42","text":"#BA0C2F"},"fordham":{"background":"#860038","text":"#FFFFFF"},"george mason":{"background":"#006633","text":"#FFCC33"},"george washington":{"background":"#E2CB92","text":"#002654"},"la salle":{"background":"#003366","text":"#FFCC00"},"loyola-chicago":{"background":"#922247","text":"#FEBD18"},"rhode island":{"background":"#68ABE8","text":"#FFFFFF"},"richmond":{"background":"#000066","text":"#990000"},"saint bonaventure":{"background":"#54261A","text":"#FDB726"},"saint joseph's":{"background":"#9E1B32","text":"#FFFFFF"},"saint louis":{"background":"#003DA5","text":"#C8C9C7"},"vcu":{"background":"#FFB300","text":"#111827"},"boston college":{"background":"#98002E","text":"#BC9B6A"},"california":{"background":"#003262","text":"#FDB515"},"clemson":{"background":"#F56600","text":"#FFFFFF"},"duke":{"background":"#003087","text":"#FFFFFF"},"florida state":{"background":"#782F40","text":"#CEB888"},"georgia tech":{"background":"#003057","text":"#B3A369"},"louisville":{"background":"#AD0000","text":"#FFFFFF"},"miami":{"background":"#005030","text":"#FD4732"},"nc state":{"background":"#CC0000","text":"#FFFFFF"},"north carolina":{"background":"#7BAFD4","text":"#FFFFFF"},"notre dame":{"background":"#0C2340","text":"#C99700"},"pittsburgh":{"background":"#003594","text":"#FFB81C"},"smu":{"background":"#C8102E","text":"#FFFFFF"},"stanford":{"background":"#8C1515","text":"#FFFFFF"},"syracuse":{"background":"#F76900","text":"#FFFFFF"},"virginia":{"background":"#232D4B","text":"#F84C1E"},"virginia tech":{"background":"#630031","text":"#CF4420"},"wake forest":{"background":"#9E7E38","text":"#FFFFFF"},"albany":{"background":"#461660","text":"#EEB211"},"binghamton":{"background":"#005A43","text":"#FFFFFF"},"bryant":{"background":"#B4975B","text":"#111827"},"maine":{"background":"#003263","text":"#B0D7FF"},"new hampshire":{"background":"#041E42","text":"#BBBCBC"},"njit":{"background":"#071D49","text":"#D22630"},"umass lowell":{"background":"#003DA5","text":"#C8102E"},"umbc":{"background":"#B18906","text":"#FFFFFF"},"vermont":{"background":"#115544","text":"#FFC72C"},"charlotte":{"background":"#046A38","text":"#B9975B"},"east carolina":{"background":"#592A8A","text":"#FDC82F"},"florida atlantic":{"background":"#003366","text":"#CC0000"},"memphis":{"background":"#003087","text":"#898D8D"},"north texas":{"background":"#00853E","text":"#FFFFFF"},"rice":{"background":"#00205B","text":"#C1C6C8"},"south florida":{"background":"#006747","text":"#CFC493"},"temple":{"background":"#9D2235","text":"#FFFFFF"},"tulane":{"background":"#006747","text":"#FFFFFF"},"tulsa":{"background":"#002D72","text":"#C5B783"},"uab":{"background":"#006341","text":"#CC8A00"},"utsa":{"background":"#0C2340","text":"#F15A22"},"wichita state":{"background":"#000000","text":"#FFCD00"},"bellarmine":{"background":"#752936","text":"#C8C8C8"},"florida gulf coast":{"background":"#002D72","text":"#007749"},"jacksonville":{"background":"#004E44","text":"#898A8D"},"lipscomb":{"background":"#FDAA00","text":"#331E54"},"north florida":{"background":"#00246B","text":"#D9D9D9"},"queens":{"background":"#192C66","text":"#898A8D"},"stetson":{"background":"#00523E","text":"#FFFFFF"},"west florida":{"background":"#00205B","text":"#00A346"},"arizona":{"background":"#003366","text":"#CC0033"},"arizona state":{"background":"#8C1D40","text":"#FFC627"},"baylor":{"background":"#115544","text":"#FFB81C"},"byu":{"background":"#002E5D","text":"#FFFFFF"},"cincinnati":{"background":"#000000","text":"#E00122"},"colorado":{"background":"#CFB87C","text":"#111827"},"houston":{"background":"#C8102E","text":"#FFFFFF"},"iowa state":{"background":"#C8102E","text":"#F1BE48"},"kansas":{"background":"#0051BA","text":"#990000"},"kansas state":{"background":"#512888","text":"#D1D1D1"},"oklahoma state":{"background":"#FF7300","text":"#FFFFFF"},"tcu":{"background":"#4D1979","text":"#FFFFFF"},"texas tech":{"background":"#CC0000","text":"#FFFFFF"},"ucf":{"background":"#BA9B37","text":"#111827"},"utah":{"background":"#CC0000","text":"#FFFFFF"},"west virginia":{"background":"#002855","text":"#EAAA00"},"illinois":{"background":"#13294B","text":"#E84A27"},"indiana":{"background":"#990000","text":"#EEEDEB"},"iowa":{"background":"#FFCD00","text":"#111827"},"maryland":{"background":"#E03A3E","text":"#FFD520"},"michigan":{"background":"#00274C","text":"#FFCB05"},"michigan state":{"background":"#18453B","text":"#FFFFFF"},"minnesota":{"background":"#7A0019","text":"#FFCC33"},"nebraska":{"background":"#E41C38","text":"#FFFFFF"},"northwestern":{"background":"#4E2A84","text":"#FFFFFF"},"ohio state":{"background":"#BB0000","text":"#FFFFFF"},"oregon":{"background":"#154733","text":"#FEE123"},"penn state":{"background":"#041E42","text":"#FFFFFF"},"purdue":{"background":"#CEB888","text":"#111827"},"rutgers":{"background":"#CC0033","text":"#FFFFFF"},"ucla":{"background":"#2D68C4","text":"#F2A900"},"usc":{"background":"#990000","text":"#FFC72C"},"washington":{"background":"#4B2E83","text":"#B7A57A"},"wisconsin":{"background":"#C5050C","text":"#FFFFFF"},"butler":{"background":"#13294B","text":"#747678"},"connecticut":{"background":"#000E2F","text":"#FFFFFF"},"creighton":{"background":"#005CA9","text":"#00235D"},"depaul":{"background":"#005EB8","text":"#990000"},"georgetown":{"background":"#041E42","text":"#8D817B"},"marquette":{"background":"#003366","text":"#FFCC00"},"providence":{"background":"#000000","text":"#8A8D8F"},"seton hall":{"background":"#004488","text":"#A2AAAD"},"st. john's":{"background":"#BA0C2F","text":"#FFFFFF"},"villanova":{"background":"#00205B","text":"#FFFFFF"},"xavier":{"background":"#0C2340","text":"#9EA2A2"},"eastern washington":{"background":"#A10022","text":"#FFFFFF"},"idaho":{"background":"#B3A369","text":"#111827"},"idaho state":{"background":"#FF671F","text":"#FFFFFF"},"montana":{"background":"#660033","text":"#999999"},"montana state":{"background":"#00205B","text":"#B9975B"},"northern arizona":{"background":"#003466","text":"#FFD200"},"northern colorado":{"background":"#013C65","text":"#F6B000"},"portland state":{"background":"#115544","text":"#FFFFFF"},"southern utah":{"background":"#C41425","text":"#FFFFFF"},"utah tech":{"background":"#0C233F","text":"#BA1C21"},"weber state":{"background":"#4B2682","text":"#A1A1A4"},"charleston southern":{"background":"#002855","text":"#A8996E"},"gardner-webb":{"background":"#BF2F37","text":"#FFFFFF"},"high point":{"background":"#330072","text":"#FFFFFF"},"longwood":{"background":"#15213B","text":"#999D9E"},"presbyterian":{"background":"#0060A9","text":"#FFFFFF"},"radford":{"background":"#C2011B","text":"#D1D3D4"},"unc ashville":{"background":"#003DA5","text":"#FFFFFF"},"usc upstate":{"background":"#00703C","text":"#FFFFFF"},"winthrop":{"background":"#660000","text":"#F0B323"},"cal baptist":{"background":"#002554","text":"#A37400"},"cal poly":{"background":"#003831","text":"#FFE395"},"csu bakersfield":{"background":"#003594","text":"#FFC72C"},"csu fullerton":{"background":"#00274C","text":"#DC8218"},"csu northridge":{"background":"#CE1126","text":"#D1CEC6"},"long beach state":{"background":"#000000","text":"#FFC72A"},"sacramento state":{"background":"#043927","text":"#C4B581"},"uc irvine":{"background":"#0C2340","text":"#FFC72C"},"uc riverside":{"background":"#2D6CC0","text":"#F1AB00"},"uc san diego":{"background":"#182B49","text":"#FFCD00"},"uc santa barbara":{"background":"#003660","text":"#FEBC11"},"utah valley":{"background":"#275D38","text":"#8E8C89"},"campbell":{"background":"#FB8025","text":"#231F20"},"charleston":{"background":"#800000","text":"#9D8958"},"drexel":{"background":"#00437B","text":"#FFDA02"},"elon":{"background":"#73000A","text":"#B59A57"},"hampton":{"background":"#0060A9","text":"#FFFFFF"},"hofstra":{"background":"#0B1E73","text":"#FEB612"},"monmouth":{"background":"#041E42","text":"#53565A"},"north carolina a&t":{"background":"#003D6D","text":"#F3B237"},"northeastern":{"background":"#D41B2C","text":"#FFFFFF"},"stony brook":{"background":"#16243E","text":"#990000"},"towson":{"background":"#FFBB00","text":"#3C3C3C"},"unc wilmington":{"background":"#003366","text":"#FFD600"},"william & mary":{"background":"#115740","text":"#F0B323"},"delaware":{"background":"#00539F","text":"#FFDD31"},"florida international":{"background":"#081E3F","text":"#B6862C"},"jacksonville state":{"background":"#CC0000","text":"#FFFFFF"},"kennesaw state":{"background":"#FDBB30","text":"#0B1315"},"liberty":{"background":"#002D62","text":"#C41230"},"middle tennessee state":{"background":"#0066CC","text":"#FFFFFF"},"missouri state":{"background":"#5E0009","text":"#FFFFFF"},"new mexico state":{"background":"#861F41","text":"#97999B"},"sam houston state":{"background":"#FE5100","text":"#FFFFFF"},"western kentucky":{"background":"#C60C30","text":"#FFFFFF"},"cleveland state":{"background":"#006747","text":"#FFFFFF"},"detroit mercy":{"background":"#A6093D","text":"#002D72"},"green bay":{"background":"#006747","text":"#8A8D8F"},"iu indy":{"background":"#9D2235","text":"#DFD1A7"},"milwaukee":{"background":"#FFBD00","text":"#111827"},"northern illinois":{"background":"#BA0C2F","text":"#FFFFFF"},"northern kentucky":{"background":"#FFC72C","text":"#111827"},"oakland":{"background":"#B59A57","text":"#111827"},"purdue fort wayne":{"background":"#002F6C","text":"#63666A"},"robert morris":{"background":"#14234B","text":"#A6192E"},"wright state":{"background":"#026937","text":"#CEA052"},"youngstown state":{"background":"#C8102E","text":"#FFFFFF"},"brown":{"background":"#4E3629","text":"#BBBCBC"},"columbia":{"background":"#003865","text":"#9BCBEB"},"cornell":{"background":"#B31B1B","text":"#FFFFFF"},"dartmouth":{"background":"#046A38","text":"#FFFFFF"},"harvard":{"background":"#A41034","text":"#FFFFFF"},"penn":{"background":"#011F5B","text":"#990000"},"princeton":{"background":"#FF671F","text":"#FFFFFF"},"yale":{"background":"#00356B","text":"#FFFFFF"},"canisius":{"background":"#0C2340","text":"#FFBA00"},"fairfield":{"background":"#C8102E","text":"#FFFFFF"},"iona":{"background":"#6F2C3F","text":"#F2A900"},"manhattan":{"background":"#00703C","text":"#FFFFFF"},"marist":{"background":"#C8102E","text":"#B2B2B2"},"merrimack":{"background":"#003768","text":"#FDB813"},"mount st. mary's":{"background":"#002855","text":"#84754E"},"niagara":{"background":"#582C83","text":"#FFFFFF"},"quinnipiac":{"background":"#0C2340","text":"#FFB81C"},"rider":{"background":"#981E32","text":"#FFFFFF"},"sacred heart":{"background":"#CE1141","text":"#B1B3B6"},"saint peter's":{"background":"#003C71","text":"#A59C94"},"siena":{"background":"#006747","text":"#FFC72C"},"akron":{"background":"#041E42","text":"#A89968"},"ball state":{"background":"#BA0C2F","text":"#FFFFFF"},"bowling green":{"background":"#4F2C1D","text":"#FE5000"},"buffalo":{"background":"#005BBB","text":"#FFFFFF"},"central michigan":{"background":"#6A0032","text":"#FFC82E"},"eastern michigan":{"background":"#006633","text":"#FFFFFF"},"kent state":{"background":"#002664","text":"#EAAB00"},"massachusetts":{"background":"#971B2F","text":"#FFFFFF"},"miami-oh":{"background":"#B61E2E","text":"#FFFFFF"},"ohio":{"background":"#00694E","text":"#CDA077"},"toledo":{"background":"#15397F","text":"#FFDA00"},"western michigan":{"background":"#6C4023","text":"#B5A167"},"coppin state":{"background":"#003056","text":"#FFC915"},"delaware state":{"background":"#EE3124","text":"#72CDF4"},"howard":{"background":"#003A63","text":"#6A808C"},"maryland eastern shore":{"background":"#862633","text":"#888B8D"},"morgan state":{"background":"#1B4383","text":"#F47937"},"norfolk state":{"background":"#007A53","text":"#F3D03F"},"north carolina central":{"background":"#880023","text":"#8E9093"},"south carolina state":{"background":"#862633","text":"#FFFFFF"},"belmont":{"background":"#00205B","text":"#C8102E"},"bradley":{"background":"#A50000","text":"#FFFFFF"},"drake":{"background":"#004477","text":"#999999"},"evansville":{"background":"#52237F","text":"#F36F21"},"illinois state":{"background":"#CE1126","text":"#F9DD16"},"indiana state":{"background":"#0142BC","text":"#FFFFFF"},"murray state":{"background":"#002144","text":"#ECAC00"},"northern iowa":{"background":"#4B116F","text":"#FFCC00"},"southern illinois":{"background":"#720000","text":"#FFFFFF"},"uic":{"background":"#041E42","text":"#AC1E2D"},"valparaiso":{"background":"#381E0E","text":"#FFCC00"},"air force":{"background":"#003087","text":"#8A8D8F"},"grand canyon":{"background":"#522398","text":"#FFFFFF"},"hawai'i":{"background":"#024731","text":"#C8C8C8"},"nevada":{"background":"#003366","text":"#807F84"},"new mexico":{"background":"#BA0C2F","text":"#A7A8AA"},"san jose state":{"background":"#0055A2","text":"#E5A823"},"uc davis":{"background":"#002855","text":"#B3A369"},"unlv":{"background":"#CF0A2C","text":"#CAC8C8"},"utep":{"background":"#041E42","text":"#FF8200"},"wyoming":{"background":"#492F24","text":"#FFC425"},"central conneticut state":{"background":"#00539B","text":"#FFFFFF"},"chicago state":{"background":"#006666","text":"#FFFFFF"},"fairleigh dickinson":{"background":"#28334A","text":"#9EA2A2"},"le moyne":{"background":"#00452A","text":"#FCE300"},"long island":{"background":"#69B3E7","text":"#FFC72C"},"mercyhurst":{"background":"#07594D","text":"#182752"},"new haven":{"background":"#3E4292","text":"#E1BF62"},"stonehill":{"background":"#2F2975","text":"#FFFFFF"},"wagner":{"background":"#00483A","text":"#B9BBBD"},"eastern illinois":{"background":"#004B83","text":"#919295"},"lindenwood":{"background":"#B5A36A","text":"#111827"},"morehead state":{"background":"#005EB8","text":"#FFCF00"},"siu-edwardsville":{"background":"#EF3829","text":"#FFFFFF"},"southeast missouri state":{"background":"#C8102E","text":"#FFFFFF"},"southern indiana":{"background":"#002D5D","text":"#CF102D"},"tennessee state":{"background":"#00539F","text":"#FFFFFF"},"ut martin":{"background":"#002A5B","text":"#F79728"},"western illinois":{"background":"#663399","text":"#FFCC00"},"boise state":{"background":"#0033A0","text":"#D64309"},"colorado state":{"background":"#1E4D2B","text":"#C8C372"},"fresno state":{"background":"#DB0032","text":"#FFFFFF"},"gonzaga":{"background":"#041E42","text":"#C8102E"},"oregon state":{"background":"#DC4405","text":"#FFFFFF"},"san diego state":{"background":"#A6192E","text":"#FFFFFF"},"texas state":{"background":"#501214","text":"#8D734A"},"utah state":{"background":"#00263A","text":"#8A8D8F"},"washington state":{"background":"#981E32","text":"#FFFFFF"},"american":{"background":"#143D8D","text":"#C41230"},"army":{"background":"#000000","text":"#D4BF91"},"boston u":{"background":"#A3011B","text":"#929497"},"bucknell":{"background":"#003865","text":"#E87722"},"colgate":{"background":"#821019","text":"#D2D4D6"},"holy cross":{"background":"#602D89","text":"#FFFFFF"},"lafayette":{"background":"#98002E","text":"#A8996E"},"lehigh":{"background":"#653600","text":"#FFD24F"},"loyola-maryland":{"background":"#00694E","text":"#CACAC8"},"navy":{"background":"#00205B","text":"#C5B783"},"appalachian state":{"background":"#222222","text":"#FFCC00"},"arkansas state":{"background":"#000000","text":"#CC092F"},"coastal carolina":{"background":"#006F71","text":"#A27752"},"georgia southern":{"background":"#011E41","text":"#A3AAAE"},"georgia state":{"background":"#0039A6","text":"#FFFFFF"},"james madison":{"background":"#450084","text":"#CBB677"},"louisiana":{"background":"#CE181E","text":"#C1C5C9"},"louisiana tech":{"background":"#002F8B","text":"#EE3311"},"louisiana-monroe":{"background":"#840029","text":"#FDB913"},"marshall":{"background":"#00B140","text":"#FFFFFF"},"old dominion":{"background":"#003057","text":"#7C878E"},"south alabama":{"background":"#00205B","text":"#BF0D3E"},"southern miss":{"background":"#000000","text":"#FFAB00"},"troy":{"background":"#8A2432","text":"#B3B5B8"},"chattanooga":{"background":"#00386B","text":"#E0AA0F"},"east tennessee state":{"background":"#041E42","text":"#FFC72C"},"furman":{"background":"#582C83","text":"#FFFFFF"},"mercer":{"background":"#F76800","text":"#FFFFFF"},"samford":{"background":"#002649","text":"#FFFFFF"},"tennessee tech":{"background":"#4F2984","text":"#FFDD00"},"the citadel":{"background":"#3975B7","text":"#FFFFFF"},"unc greensboro":{"background":"#0F2044","text":"#FFB71B"},"vmi":{"background":"#A71F23","text":"#FFD520"},"western carolina":{"background":"#592C88","text":"#C1A875"},"wofford":{"background":"#886E4C","text":"#FFFFFF"},"alabama":{"background":"#9E1B32","text":"#FFFFFF"},"arkansas":{"background":"#9D2235","text":"#FFFFFF"},"auburn":{"background":"#0C2340","text":"#E87722"},"florida":{"background":"#0021A5","text":"#FA4616"},"georgia":{"background":"#BA0C2F","text":"#FFFFFF"},"kentucky":{"background":"#0033A0","text":"#FFFFFF"},"lsu":{"background":"#461D7C","text":"#FDD023"},"mississippi":{"background":"#14213D","text":"#CE1126"},"mississippi state":{"background":"#660000","text":"#FFFFFF"},"missouri":{"background":"#F1B82D","text":"#111827"},"oklahoma":{"background":"#841617","text":"#FDF9D8"},"south carolina":{"background":"#73000A","text":"#FFFFFF"},"tennessee":{"background":"#FF8200","text":"#FFFFFF"},"texas":{"background":"#BF5700","text":"#FFFFFF"},"texas a&m":{"background":"#500000","text":"#FFFFFF"},"vanderbilt":{"background":"#B49248","text":"#111827"},"east texas a&m":{"background":"#00386C","text":"#F1B20F"},"houston christian":{"background":"#1C4E9D","text":"#FFFFFF"},"incarnate word":{"background":"#CB333B","text":"#FFFFFF"},"lamar":{"background":"#DC0032","text":"#FFFFFF"},"mcneese state":{"background":"#00529B","text":"#FFD204"},"new orleans":{"background":"#005CA6","text":"#A3A9AC"},"nicholls state":{"background":"#AE132A","text":"#72808A"},"northwestern state":{"background":"#663399","text":"#FF6600"},"southeastern louisiana":{"background":"#006341","text":"#EAAA00"},"stephen f. austin":{"background":"#613393","text":"#FFFFFF"},"texas a&m-corpus christi":{"background":"#0067C5","text":"#01562A"},"ut rio grande valley":{"background":"#F05023","text":"#0C2340"},"kansas city":{"background":"#005293","text":"#FECB00"},"north dakota":{"background":"#009A44","text":"#AAAEAD"},"north dakota state":{"background":"#0A5640","text":"#FFC72A"},"omaha":{"background":"#D71920","text":"#FFFFFF"},"oral roberts":{"background":"#002F60","text":"#C5B783"},"south dakota":{"background":"#AD0000","text":"#FFFFFF"},"south dakota state":{"background":"#0033A0","text":"#FFD100"},"st. thomas (mn)":{"background":"#510C76","text":"#FFFFFF"},"alabama a&m":{"background":"#660000","text":"#FFFFFF"},"alabama state":{"background":"#C99700","text":"#111827"},"alcorn state":{"background":"#4B306A","text":"#CE8E00"},"arkansas-pine bluff":{"background":"#EEB310","text":"#111827"},"bethune-cookman":{"background":"#6F263D","text":"#F2A900"},"florida a&m":{"background":"#1B5633","text":"#EE7624"},"grambling state":{"background":"#EAA921","text":"#111827"},"jackson state":{"background":"#002147","text":"#FFFFFF"},"mississippi valley state":{"background":"#00703C","text":"#E51937"},"prairie view a&m":{"background":"#330066","text":"#FFCC33"},"southern":{"background":"#58B6E7","text":"#FFCE34"},"texas southern":{"background":"#7C183E","text":"#9DA6AB"},"austin peay":{"background":"#C41E3A","text":"#FFFFFF"},"central arkansas":{"background":"#4F2D7F","text":"#818A8F"},"eastern kentucky":{"background":"#8A0039","text":"#FFFFFF"},"little rock":{"background":"#6E2639","text":"#A7A9AC"},"north alabama":{"background":"#46166B","text":"#DB9F11"},"west georgia":{"background":"#0656A5","text":"#990000"},"abilene christian":{"background":"#4F2170","text":"#C5C6C8"},"tarleton state":{"background":"#4F2D7F","text":"#FFFFFF"},"ut arlington":{"background":"#F58025","text":"#0064B1"},"denver":{"background":"#8B2332","text":"#8B6F4B"},"loyola-marymount":{"background":"#B62B3A","text":"#00447C"},"pacific":{"background":"#E35205","text":"#231F20"},"pepperdine":{"background":"#00205C","text":"#EE7624"},"portland":{"background":"#1E1656","text":"#5E6A71"},"saint mary's":{"background":"#06315B","text":"#D80024"},"san diego":{"background":"#84BCE8","text":"#002868"},"san francisco":{"background":"#00543C","text":"#FDBB30"},"santa clara":{"background":"#862633","text":"#FFFFFF"},"seattle":{"background":"#AA0000","text":"#FFFFFF"}};
+const colorAliases = {'ole miss':'mississippi','uconn':'connecticut','unc':'north carolina','pitt':'pittsburgh','byu':'brigham young','smu':'southern methodist','tcu':'texas christian','lsu':'louisiana state','usc':'southern california','ucf':'central florida','utep':'texas el paso','utsa':'texas san antonio','miami fl':'miami','miami ohio':'miami oh','st johns':'saint johns','saint marys':'st marys'};
+function teamKey(name){return String(name).toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/&/g,'and').replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ')}
+function teamStyle(name){const key=teamKey(name);return teamColors[key]||teamColors[colorAliases[key]]||null}
+
+// Direct logo URLs for known schools, plus fallback directory lookup for the full field.
+// These CDN images do not require an ESPN API request to display.
+const knownLogoIds={
+ 'duke':150,'illinois':356,'arizona':12,'gonzaga':2250,'connecticut':41,'uconn':41,
+ 'nebraska':158,'florida':57,'houston':248,'vanderbilt':238,'tennessee':2633,
+ 'north carolina':153,'kansas':2305,'kentucky':96,'purdue':2509,'michigan':130,
+ 'michigan state':127,'iowa state':66,'alabama':333,'auburn':2,'baylor':239,
+ 'arkansas':8,'wisconsin':275,'ohio state':194,'maryland':120,'ucla':26,
+ 'usc':30,'southern california':30,'texas':251,'texas a and m':245,'texas tech':2641,
+ 'virginia':258,'virginia tech':259,'clemson':228,'florida state':52,
+ 'louisville':97,'nc state':152,'north carolina state':152,'syracuse':183,
+ 'wake forest':154,'notre dame':87,'pittsburgh':221,'pitt':221,'miami':2390,
+ 'marquette':269,'creighton':156,'villanova':222,'st johns':2599,
+ 'st john s':2599,'georgetown':46,'xavier':2752,'butler':2086,'providence':2507,
+ 'seton hall':2550,'cincinnati':2132,'byu':252,'brigham young':252,
+ 'utah':254,'colorado':38,'oregon':2483,'oregon state':204,'washington':264,
+ 'washington state':265,'arizona state':9,'iowa':2294,'indiana':84,
+ 'minnesota':135,'northwestern':77,'penn state':213,'rutgers':164,
+ 'memphis':235,'south florida':58,'temple':218,'tulane':2655,
+ 'smu':2567,'tcu':2628,'lsu':99,'mississippi':145,'ole miss':145,
+ 'mississippi state':344,'south carolina':2579,'georgia':61,
+ 'oklahoma':201,'oklahoma state':197,'missouri':142,'west virginia':277,
+ 'san diego state':21,'new mexico':167,'unlv':2439,'boise state':68,
+ 'utah state':328,'wyoming':2751,'colorado state':36,'dayton':2168,
+ 'vcu':2670,'richmond':257,'saint louis':139,'davidson':2166,
+ 'loyola chicago':2350,'george mason':2244,'rhode island':227,
+ 'st bonaventure':179,'st josephs':2603,'saint joseph s':2603,
+ 'wichita state':2724,'north texas':249,'uab':5,'florida atlantic':2226,
+ 'charlotte':2429,'east carolina':151,'liberty':2335,'grand canyon':2253,
+ 'high point':2272,'drake':2181,'belmont':2057,'mcneese state':2377,
+ 'vermont':261,'princeton':163,'yale':43,'harvard':108,'cornell':172,
+ 'uc irvine':300,'uc san diego':28,'uc santa barbara':2540,
+ 'california':25,'stanford':24,'san francisco':2539,'saint marys':2608,
+ 'saint mary s':2608,'santa clara':2541,'pepperdine':2492,'portland':2501,
+ 'montana state':147,'montana':149,'appalachian state':2026,'james madison':256,
+ 'chattanooga':236,'furman':231,'samford':2535,'wofford':2747
+};
+const logoByName=new Map();
+const missingLogoNames=new Set();
+function updateLogoCoverage(){
+ const names=[...new Set(teams.map(t=>t.name))];
+ const missing=names.filter(n=>!teamLogo(n));
+ missingLogoNames.clear();missing.forEach(n=>missingLogoNames.add(n));
+ const el=document.getElementById('logo-coverage');
+ if(el)el.textContent=`Logo sources found for ${names.length-missing.length} of ${names.length} teams${missing.length?' · '+missing.length+' still unmatched':''}. Images may still fail to load.`;
+}
+const logoAliases={'uconn':'connecticut','ole miss':'mississippi','pitt':'pittsburgh',
+ 'unc':'north carolina','miami fl':'miami','st johns':'st john s',
+ 'saint marys':'saint mary s','saint josephs':'saint joseph s',
+ 'saint bonaventure':'st bonaventure','brigham young':'byu',
+ 'southern california':'usc','north carolina state':'nc state',
+ 'cal':'california','umass':'massachusetts','louisiana state':'lsu',
+ 'texas christian':'tcu','southern methodist':'smu',
+ 'loyola chicago':'loyola chicago','iu indianapolis':'iu indy'};
+function logoKey(n){return teamKey(n).replace(/\b(university|college|the)\b/g,'').replace(/\s+/g,' ').trim()}
+function teamLogo(name){const k=logoKey(name),id=knownLogoIds[k]||knownLogoIds[logoAliases[k]];
+ return id?`https://a.espncdn.com/i/teamlogos/ncaa/500/${id}.png`:logoByName.get(k)||logoByName.get(logoAliases[k])||null}
+function teamInitials(name){return String(name).split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase()}
+function logoMarkup(name,large=false){const url=teamLogo(name),cls=large?'profile-logo':'team-logo',fallback=large?'profile-logo-fallback':'team-logo-fallback';
+ const initials=escapeHTML(teamInitials(name));
+ if(!url)return `<span class="${fallback}" aria-label="Logo unavailable">${initials}</span>`;
+ return `<img class="${cls}" src="${escapeHTML(url)}" alt="${escapeHTML(name)} logo" loading="lazy" referrerpolicy="no-referrer" onerror="this.outerHTML='<span class=&quot;${fallback}&quot;>${initials}</span>'">`;
+}
+async function loadLogos(){
+ const api='https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/teams?limit=1000';
+ // Use ESPN's public directory directly; do not send requests through third-party proxies.
+ const endpoints=[api];
+ for(const endpoint of endpoints){
+  try{
+   const response=await fetch(endpoint,{cache:'force-cache'});
+   if(!response.ok)continue;
+   const payload=await response.json();let count=0;
+   for(const sport of (payload.sports||[]))for(const league of (sport.leagues||[]))for(const entry of (league.teams||[])){
+    const t=entry.team||entry;
+    const url=(t.logos||[]).find(x=>x.href)?.href||(t.id?`https://a.espncdn.com/i/teamlogos/ncaa/500/${t.id}.png`:null);
+    if(!url)continue;
+    for(const name of [t.displayName,t.shortDisplayName,t.name,t.location,t.abbreviation]){
+     if(name){const key=logoKey(name);if(key&&!logoByName.has(key))logoByName.set(key,url)}
+    }
+    count++;
+   }
+   if(count){render();updateLogoCoverage();if(!document.getElementById('profile').classList.contains('hide')){
+    const name=document.getElementById('pr-name').textContent;
+    document.getElementById('pr-logo').innerHTML=logoMarkup(name,true);
+   }break}
+  }catch(e){console.warn('Logo directory unavailable; using built-in logo IDs.',e)}
+ }
+}
+
+const fields=[['rank','#'],['name','Team'],['rating','Rating'],['wins','W'],['losses','L'],['off','Off'],['def','Def'],['sos','SOS'],['luck','Luck'],['tempo','Tempo'],['q1','Q1 W'],['q2','Q2 W'],['q3l','Q3 L'],['q4l','Q4 L'],['road','Road W']];const numeric=fields.map(x=>x[0]).filter(x=>x!=='name');let teams=[],sort='rating',descending=true,source='demo';
+const demo=[['Michigan',11,10.2,8.1,.02,70.8,8,5,0,0,7,25,7],['Duke',12.2,9.7,7.2,-.01,69.4,9,4,1,0,6,26,6],['Purdue',13.1,7.6,6.9,.01,68.1,7,6,1,0,6,24,8],['Michigan State',9.4,11.2,7.5,-.02,68.8,8,5,0,0,7,25,7],['Houston',8.9,12.1,8.4,.01,64.2,9,4,0,0,8,27,5],['Arizona',12.6,8.3,6.7,-.03,73.8,7,6,1,0,7,24,8],['Florida',11.7,9.4,7.9,.01,72.1,8,5,0,1,6,25,7],['UConn',10.9,9.6,6.4,.02,66.7,7,5,1,0,6,24,8],['Kansas',10.6,8.8,8.2,-.01,70.2,8,4,1,0,6,23,9],['Iowa State',8.7,11.4,7.4,.02,67.9,7,6,0,0,7,26,6],['Tennessee',8.2,11.7,7.8,-.02,65.7,8,4,0,0,6,25,7],['Alabama',13.5,6.7,8.7,.03,77.4,8,5,1,0,7,24,8]];
+function calc(t){return 2.7*t.off+3.3*t.def+12*(t.wins-t.losses)/Math.max(1,t.wins+t.losses)+2*t.sos-10*t.luck-((t.tempo-71.6)**2)/25+2*t.q1+.75*t.q2-2*t.q3l-3*t.q4l+.5*t.road}function demoRows(){return demo.map(([name,off,def,sos,luck,tempo,q1,q2,q3l,q4l,road,wins,losses])=>{const t={name,off,def,sos,luck,tempo,q1,q2,q3l,q4l,road,wins,losses};t.rating=calc(t);return t})}function parseCSV(text){const lines=[];let row=[],cell='',quote=false;for(let i=0;i<text.length;i++){const c=text[i];if(c==='"'){if(quote&&text[i+1]==='"'){cell+='"';i++}else quote=!quote}else if(c===','&&!quote){row.push(cell);cell=''}else if((c==='\n'||c==='\r')&&!quote){if(c==='\r'&&text[i+1]==='\n')i++;row.push(cell);if(row.some(x=>x.trim()))lines.push(row);row=[];cell=''}else cell+=c}row.push(cell);if(row.some(x=>x.trim()))lines.push(row);return lines}function fromCSV(s){const data=parseCSV(s),keys=['name','rating','wins','losses','off','def','sos','luck','tempo','q1','q2','q3l','q4l','road'];return data.filter(r=>r.length>=14&&r[0].trim()&&r[0].toLowerCase()!=='team').map(r=>{const t={};keys.forEach((k,i)=>t[k]=i===0?r[i].trim():Number((r[i]||'').replace(/,/g,'')));if(!Number.isFinite(t.rating))t.rating=calc(t);return t}).filter(t=>Number.isFinite(t.rating)&&Number.isFinite(t.wins)&&Number.isFinite(t.losses))}function rankRows(){return [...teams].sort((a,b)=>b.rating-a.rating||a.name.localeCompare(b.name)).map((t,i)=>({...t,rank:i+1}))}function fmt(v,k){if(k==='name')return v;if(k==='rank'||['wins','losses','q1','q2','q3l','q4l','road'].includes(k))return String(v);return Number.isFinite(v)?Number(v).toFixed(k==='luck'?3:2):'—'}function render(){const all=rankRows(),q=document.getElementById('search').value.toLowerCase(),f=document.getElementById('filter').value;let arr=all.filter(t=>t.name.toLowerCase().includes(q)&&(f==='all'||f==='winning'&&t.wins>t.losses||f==='q1'&&t.q1>0));arr.sort((a,b)=>{let x=a[sort],y=b[sort];return typeof x==='string'? (descending?y.localeCompare(x):x.localeCompare(y)):descending?y-x:x-y});document.getElementById('head').innerHTML=fields.map(([k,l])=>`<th class="${k==='name'?'':'num'}" data-key="${k}">${l}${sort===k?(descending?' ↓':' ↑'):''}</th>`).join('');document.getElementById('rows').innerHTML=arr.map(t=>`<tr${teamStyle(t.name)?` class="team-colored" style="--team-bg:${teamStyle(t.name).background};--team-fg:${teamStyle(t.name).text}"`:``}>${fields.map(([k])=>`<td class="${k==='name'?'':'num'}">${k==='name'?`<button class="teamlink" data-team="${encodeURIComponent(t.name)}">${logoMarkup(t.name)}<span>${escapeHTML(t.name)}</span></button>`:fmt(t[k],k)}</td>`).join('')}</tr>`).join('');document.querySelectorAll('th[data-key]').forEach(el=>el.onclick=()=>{const k=el.dataset.key;if(sort===k)descending=!descending;else{sort=k;descending=k!=='name'}render()});document.querySelectorAll('[data-team]').forEach(el=>el.onclick=()=>profile(decodeURIComponent(el.dataset.team)));document.getElementById('total').textContent=all.length;document.getElementById('high').textContent=all.length?fmt(all[0].rating,'rating'):'—';document.getElementById('average').textContent=all.length?(all.reduce((s,t)=>s+t.rating,0)/all.length).toFixed(2):'—';document.getElementById('games').textContent=all.reduce((s,t)=>s+t.wins+t.losses,0)/2;document.getElementById('count').textContent=`Showing ${arr.length} of ${all.length} teams · ${source==='demo'?'Illustrative sample data — not real rankings':'Connected spreadsheet data'}`;document.getElementById('source-badge').textContent=source==='demo'?'Demo data — connect your sheet':'Google Sheets data connected';updateLogoCoverage()}function escapeHTML(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function page(id){['rank','profile','standings','scores','method','data'].forEach(k=>document.getElementById(k).classList.toggle('hide',k!==id));document.getElementById('nav-rank').classList.toggle('active',id==='rank'||id==='profile');document.getElementById('nav-standings').classList.toggle('active',id==='standings');document.getElementById('nav-scores').classList.toggle('active',id==='scores');document.getElementById('nav-method').classList.toggle('active',id==='method');document.getElementById('nav-data').classList.toggle('active',id==='data');if(id==='standings'&&!standingsLoaded&&!standingsLoading)loadStandings();if(id==='scores'&&!scoresLoaded)loadScores();window.scrollTo(0,0)}function profile(name){const t=rankRows().find(t=>t.name===name);if(!t)return;document.getElementById('pr-rank').textContent=`NATIONAL RANK #${t.rank}`;document.getElementById('pr-name').textContent=t.name;document.getElementById('pr-logo').innerHTML=logoMarkup(t.name,true);document.getElementById('pr-summary').textContent=`${t.wins}–${t.losses} record · ${t.rating.toFixed(2)} overall rating`;const ms=[['National rank',`#${t.rank}`],['Overall rating',t.rating.toFixed(2)],['Record',`${t.wins}–${t.losses}`],['Offense',t.off.toFixed(2)],['Defense',t.def.toFixed(2)],['Strength of schedule',t.sos.toFixed(2)],['Luck',t.luck.toFixed(3)],['Tempo',t.tempo.toFixed(2)],['Road wins',t.road]];document.getElementById('pr-metrics').innerHTML=ms.map(([k,v])=>`<div class="metric"><small>${k}</small><strong>${v}</strong></div>`).join('');const components=[['Offense',2.7*t.off],['Defense',3.3*t.def],['W–L',12*(t.wins-t.losses)/Math.max(1,t.wins+t.losses)],['SOS',2*t.sos],['Luck',-10*t.luck],['Tempo',-((t.tempo-71.6)**2)/25],['Q1 wins',2*t.q1],['Q2 wins',.75*t.q2],['Q3 losses',-2*t.q3l],['Q4 losses',-3*t.q4l],['Road wins',.5*t.road]];document.getElementById('breakdown').innerHTML=`<div class="tablewrap"><table><thead><tr><th>Component</th><th class="num">Rating contribution</th></tr></thead><tbody>${components.map(([k,v])=>`<tr><td>${k}</td><td class="num">${v>=0?'+':''}${v.toFixed(2)}</td></tr>`).join('')}</tbody></table></div>`;document.getElementById('resume').innerHTML=`<div class="profilegrid">${[['Quad 1 wins',t.q1],['Quad 2 wins',t.q2],['Quad 3 losses',t.q3l],['Quad 4 losses',t.q4l],['Road wins',t.road],['Win percentage',((t.wins/(t.wins+t.losses||1))*100).toFixed(1)+'%']].map(([k,v])=>`<div class="metric"><small>${k}</small><strong>${v}</strong></div>`).join('')}</div>`;page('profile')}
+async function load(url){const st=document.getElementById('loadstatus');st.textContent='Loading…';try{const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);const parsed=fromCSV(await r.text());if(!parsed.length)throw Error('No valid team rows found; check column order and published CSV URL');teams=parsed;source='sheet';st.textContent=`Loaded ${teams.length} teams successfully.`;render();page('rank')}catch(e){st.textContent=`Could not load data: ${e.message}. Check that the CSV is publicly accessible.`}}
+// ESPN's public men's D-I standings feed. This is independent of the custom rankings CSV.
+const standingsUrl='https://site.api.espn.com/apis/v2/sports/basketball/mens-college-basketball/standings?season=2027';
+let standingsGroups=[],standingsLoaded=false,standingsLoading=false,standingsLastUpdated=null;
+function standingValue(entries,types){
+ const e=(entries||[]).find(x=>types.some(t=>(x.type||'').toLowerCase()===t||(x.name||'').toLowerCase()===t||(x.abbreviation||'').toLowerCase()===t));
+ if(!e)return null;
+ const n=Number(e.value);return Number.isFinite(n)?n:null;
+}
+function standingRecord(entries,type){
+ const e=(entries||[]).find(x=>[x.type,x.name,x.abbreviation].some(v=>String(v||'').toLowerCase()===type));
+ return e?.displayValue||null;
+}
+function recordPair(record,entries,prefix){
+ if(record){const m=String(record).match(/(\d+)\s*[-–]\s*(\d+)/);if(m)return [Number(m[1]),Number(m[2])];}
+ const w=standingValue(entries,[prefix+'wins',prefix+'-wins']);
+ const l=standingValue(entries,[prefix+'losses',prefix+'-losses']);
+ return [w,l];
+}
+function normalizeStanding(entry){
+ const t=entry.team||entry;
+ const stats=entry.stats||[];
+ const overall=entry.records?.find(x=>x.type==='total'||x.type==='overall')?.summary||standingRecord(stats,'overall');
+ const conference=entry.records?.find(x=>x.type==='vsconf'||x.type==='conference')?.summary||standingRecord(stats,'vsconf')||standingRecord(stats,'conference');
+ let [ow,ol]=recordPair(overall,stats,'overall');
+ let [cw,cl]=recordPair(conference,stats,'conference');
+ if(ow===null)ow=standingValue(stats,['wins']);
+ if(ol===null)ol=standingValue(stats,['losses']);
+ if(cw===null)cw=standingValue(stats,['leaguewins','conferencewins']);
+ if(cl===null)cl=standingValue(stats,['leaguelosses','conferencelosses']);
+ return {name:t.displayName||t.shortDisplayName||t.name||t.location||'Unknown',id:t.id||null,logo:t.logos?.[0]?.href||null,ow,ol,cw,cl};
+}
+function parseStandingsPayload(payload){
+ const out=[];const seen=new Set();
+ function walk(node,depth=0){
+  if(!node||typeof node!=='object'||depth>9)return;
+  const st=node.standings;
+  const entries=Array.isArray(st?.entries)?st.entries:(Array.isArray(node.entries)?node.entries:null);
+  if(entries&&entries.length){
+   const label=node.name||node.displayName||node.abbreviation||node.group?.name||node.group?.displayName||st?.name||st?.displayName||'Conference';
+   const key=String(node.id||node.uid||label);
+   if(!seen.has(key)){seen.add(key);out.push({name:label,teams:entries.map(normalizeStanding).filter(x=>x.name!=='Unknown')});}
+  }
+  for(const k of ['children','groups','conferences'])if(Array.isArray(node[k]))for(const child of node[k])walk(child,depth+1);
+ }
+ if(Array.isArray(payload.children))payload.children.forEach(n=>walk(n));
+ if(Array.isArray(payload.groups))payload.groups.forEach(n=>walk(n));
+ if(Array.isArray(payload))payload.forEach(n=>walk(n));
+ if(!out.length)walk(payload);
+ return out.filter(x=>x.teams.length).sort((a,b)=>a.name.localeCompare(b.name));
+}
+function standingsRecord(w,l){return w===null||l===null?'—':`${w}–${l}`}
+function standingsPct(w,l){return w===null||l===null||w+l===0?'—':(w/(w+l)).toFixed(3)}
+function standingsLogo(t){
+ const local=teamLogo(t.name),url=local||t.logo||(t.id?`https://a.espncdn.com/i/teamlogos/ncaa/500/${encodeURIComponent(t.id)}.png`:null);
+ const initials=escapeHTML(teamInitials(t.name));
+ return url?`<img class="team-logo" src="${escapeHTML(url)}" alt="" loading="lazy" onerror="this.outerHTML='<span class=&quot;team-logo-fallback&quot;>${initials}</span>'">`:`<span class="team-logo-fallback">${initials}</span>`;
+}
+function renderStandings(){
+ const query=document.getElementById('standings-search').value.trim().toLowerCase();
+ const target=document.getElementById('standings-tables');
+ const groups=standingsGroups.map(g=>({...g,teams:g.teams.filter(t=>!query||g.name.toLowerCase().includes(query)||t.name.toLowerCase().includes(query))})).filter(g=>g.teams.length);
+ if(!groups.length){target.innerHTML='<div class="panel"><p>No matching conferences or teams found.</p></div>';return;}
+ target.innerHTML=groups.map(g=>{
+  const rows=[...g.teams].sort((a,b)=>(b.cw??-1)-(a.cw??-1)||(a.cl??999)-(b.cl??999)||(b.ow??-1)-(a.ow??-1)||a.name.localeCompare(b.name));
+  return `<div class="panel"><h2>${escapeHTML(g.name)} <span class="pill">${rows.length} teams</span></h2><div class="tablewrap"><table><thead><tr><th>Team</th><th class="num">Conf.</th><th class="num">Overall</th><th class="num">Pct.</th></tr></thead><tbody>${rows.map(t=>{const color=teamStyle(t.name);return `<tr${color?` class="team-colored" style="--team-bg:${color.background};--team-fg:${color.text}"`:''}><td><span class="standings-team">${standingsLogo(t)}<span>${escapeHTML(t.name)}</span></span></td><td class="num">${standingsRecord(t.cw,t.cl)}</td><td class="num">${standingsRecord(t.ow,t.ol)}</td><td class="num">${standingsPct(t.cw,t.cl)}</td></tr>`}).join('')}</tbody></table></div></div>`;
+ }).join('');
+}
+async function loadStandings(){
+ if(standingsLoading)return;standingsLoading=true;
+ const status=document.getElementById('standings-status');status.textContent='Loading standings…';
+ try{
+  const response=await fetch(standingsUrl,{cache:'no-store'});
+  if(!response.ok)throw Error('Data provider returned HTTP '+response.status);
+  const payload=await response.json();const groups=parseStandingsPayload(payload);
+  if(!groups.length)throw Error('No conference standings were returned in a recognized format');
+  standingsGroups=groups;standingsLoaded=true;standingsLastUpdated=new Date();
+  status.textContent=`${groups.length} conferences loaded`;
+  document.getElementById('standings-updated').textContent='Last retrieved: '+standingsLastUpdated.toLocaleString()+' · ESPN data · 2026–27 season';
+  renderStandings();
+ }catch(err){
+  status.textContent='Standings unavailable';
+  document.getElementById('standings-updated').textContent='Could not retrieve live standings: '+err.message;
+  if(!standingsLoaded)document.getElementById('standings-tables').innerHTML='<div class="panel"><h2>Standings temporarily unavailable</h2><p>The basketball data feed could not be loaded. No records have been invented. Try Refresh standings later.</p></div>';
+  console.warn('Standings request failed:',err);
+ }finally{standingsLoading=false;}
+}
+document.getElementById('nav-standings').onclick=()=>page('standings');
+document.getElementById('standings-refresh').onclick=loadStandings;
+document.getElementById('standings-search').oninput=renderStandings;
+
+document.getElementById('nav-rank').onclick=()=>page('rank');document.getElementById('nav-method').onclick=()=>page('method');document.getElementById('nav-data').onclick=()=>page('data');document.getElementById('back').onclick=()=>page('rank');document.getElementById('search').oninput=render;document.getElementById('filter').onchange=render;document.getElementById('save').onclick=()=>{const u=document.getElementById('sheeturl').value.trim();if(!u)return;localStorage.setItem('cbb365csv',u);load(u)};document.getElementById('refresh').onclick=()=>{const u=document.getElementById('sheeturl').value.trim();if(u)load(u)};document.getElementById('reset').onclick=()=>{localStorage.removeItem('cbb365csv');document.getElementById('sheeturl').value='';teams=demoRows();source='demo';document.getElementById('loadstatus').textContent='Showing illustrative sample data.';render();page('rank')};document.getElementById('export').onclick=()=>{const rows=rankRows(),csv=[fields.map(x=>x[1]),...rows.map(t=>fields.map(([k])=>t[k]))].map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='cbb-top-365-rankings.csv';a.click();URL.revokeObjectURL(a.href)};document.getElementById('missing-logos').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([[...missingLogoNames].sort().join('\n')],{type:'text/plain'}));a.download='unmatched-cbb-logo-names.txt';a.click();URL.revokeObjectURL(a.href)};teams=demoRows();render();loadLogos();const defaultCsvUrl='https://docs.google.com/spreadsheets/d/e/2PACX-1vQToIBXzVUos4pEIqsreBaAQnUrhCYSPSguXfsBD3eE9VfglwXMz1fmiTQKaS1z8rqpdewmuEvkT8HM/pub?gid=0&single=true&output=csv';const saved=localStorage.getItem('cbb365csv');const activeCsvUrl=saved||defaultCsvUrl;document.getElementById('sheeturl').value=activeCsvUrl;load(activeCsvUrl)
+
+// Scores use ESPN's public scoreboard/summary endpoints. Rankings remain sourced from the connected CSV.
+let scoresLoaded=false,scoresLoading=false,scoresEvents=[];
+const scoresDateEl=document.getElementById('scores-date');
+function localDateISO(date=new Date()){const y=date.getFullYear(),m=String(date.getMonth()+1).padStart(2,'0'),d=String(date.getDate()).padStart(2,'0');return `${y}-${m}-${d}`}
+scoresDateEl.value=localDateISO();
+function rankingFor(t){
+ const id=String(t.id||'');
+ const k=teamKey(t.displayName||t.shortDisplayName||t.location||t.name||'');
+ const short=teamKey(t.location||t.name||'');
+ const idNames=Object.entries(knownLogoIds).filter(([name,n])=>String(n)===id).map(([name])=>name);
+ const candidates=[k,short,teamKey(t.shortDisplayName||''),...idNames].filter(Boolean);
+ const alias={
+ 'ole miss':'mississippi','uconn':'connecticut','pitt':'pittsburgh','unc':'north carolina',
+ 'nc state':'nc state','north carolina state':'nc state','st johns':'st john s','st john s':'st john s',
+ 'saint marys':'saint mary s','saint mary s':'saint mary s','miami hurricanes':'miami',
+ 'miami redhawks':'miami oh','miami oh':'miami oh','loyola chicago':'loyola chicago',
+ 'loyola maryland':'loyola maryland','ucf':'ucf','byu':'byu','lsu':'lsu','smu':'smu',
+ 'texas a and m':'texas a and m','saint bonaventure':'saint bonaventure',
+ 'umass':'massachusetts','california baptist':'cal baptist','college of charleston':'charleston',
+ 'southern california':'usc','iu indianapolis':'iu indy','ut rio grande valley':'ut rio grande valley',
+ 'unc asheville':'unc ashville','university of connecticut':'connecticut'
+ };
+ const ranked=rankRows();
+ for(const candidate of candidates){
+  const wanted=alias[candidate]||candidate;
+  const found=ranked.find(x=>teamKey(x.name)===wanted||teamKey(x.name)===candidate);
+  if(found)return found.rank;
+ }
+ return null;
+}
+function gameTeamMarkup(c){
+ const t=c.team||{},rank=rankingFor(t),name=t.shortDisplayName||t.displayName||t.name||'Unknown';
+ const logo=t.logo||t.logos?.[0]?.href||teamLogo(name)||'';
+ const image=logo?`<img class="team-logo" src="${escapeHTML(logo)}" alt="" loading="lazy" onerror="this.style.display='none'">`:`<span class="team-logo-fallback">${escapeHTML(teamInitials(name))}</span>`;
+ return `<div class="score-team">${image}${rank!==null?`<span class="score-rank">#${rank}</span>`:''}<span class="score-name">${escapeHTML(name)}</span><span class="score-value">${escapeHTML(c.score??'—')}</span></div>`;
+}
+function eventStatus(e){return e.status?.type?.shortDetail||e.status?.type?.detail||e.status?.type?.description||'Scheduled'}
+function renderScores(){
+ const target=document.getElementById('scores-games');
+ if(!scoresEvents.length){target.innerHTML='<div class="panel"><p>No games were listed for this date. Try another date, especially once the season begins.</p></div>';return}
+ target.innerHTML=scoresEvents.map(e=>{
+ const competitors=e.competitions?.[0]?.competitors||[];
+ const away=competitors.find(x=>x.homeAway==='away')||competitors[0],home=competitors.find(x=>x.homeAway==='home')||competitors[1];
+ return `<div class="panel"><div class="score-meta">${escapeHTML(eventStatus(e))} · ${escapeHTML(e.competitions?.[0]?.venue?.fullName||'')}</div>${away?gameTeamMarkup(away):''}${home?gameTeamMarkup(home):''}<button class="score-card-action" data-game="${escapeHTML(String(e.id))}">View box score →</button></div>`;
+ }).join('');
+ target.querySelectorAll('[data-game]').forEach(btn=>btn.onclick=()=>loadBoxScore(btn.dataset.game));
+}
+async function loadScores(){
+ if(scoresLoading)return;scoresLoading=true;
+ const status=document.getElementById('scores-status');status.textContent='Loading games…';
+ document.getElementById('scores-detail').classList.add('hide');
+ const date=scoresDateEl.value.replaceAll('-','');
+ try{
+  const url=`https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?dates=${date}&limit=500&groups=50`;
+  const res=await fetch(url,{cache:'no-store'});if(!res.ok)throw Error('ESPN returned HTTP '+res.status);
+  const data=await res.json();scoresEvents=Array.isArray(data.events)?data.events:[];
+  scoresLoaded=true;status.textContent=`${scoresEvents.length} games · ${scoresDateEl.value}`;renderScores();
+ }catch(err){status.textContent='Scores unavailable';document.getElementById('scores-games').innerHTML=`<div class="panel"><p>Could not load ESPN scores (${escapeHTML(err.message)}). Try Refresh games later.</p></div>`}
+ finally{scoresLoading=false}
+}
+function statValue(v){return v===null||v===undefined?'—':String(v)}
+function boxScoreTable(team){
+ const name=team.team?.displayName||team.team?.name||'Team';
+ const stats=team.statistics||[];
+ const labels=stats[0]?.labels||[];
+ const athletes=stats.flatMap(group=>(group.athletes||[]).map(a=>({...a,labels:group.labels||labels})));
+ if(!athletes.length)return `<div class="panel"><h2>${escapeHTML(name)}</h2><p>Player box score is not available for this game yet.</p></div>`;
+ const headings=athletes[0].labels||labels;
+ return `<div class="panel"><h2>${escapeHTML(name)}</h2><div class="tablewrap"><table><thead><tr><th>Player</th>${headings.map(h=>`<th class="num">${escapeHTML(String(h))}</th>`).join('')}</tr></thead><tbody>${athletes.map(a=>`<tr><td>${escapeHTML(a.athlete?.displayName||a.athlete?.shortName||'Player')}</td>${(a.stats||[]).map(v=>`<td class="num">${escapeHTML(statValue(v))}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>`;
+}
+async function loadBoxScore(id){
+ const target=document.getElementById('scores-detail');target.classList.remove('hide');
+ target.innerHTML='<div class="panel"><p>Loading player box score…</p></div>';target.scrollIntoView({behavior:'smooth',block:'start'});
+ try{
+  const res=await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/summary?event=${encodeURIComponent(id)}`,{cache:'no-store'});
+  if(!res.ok)throw Error('ESPN returned HTTP '+res.status);
+  const data=await res.json();const competitors=data.header?.competitions?.[0]?.competitors||[];
+  const header=competitors.map(c=>gameTeamMarkup(c)).join('');
+  const players=data.boxscore?.players||[];
+  const teamStats=data.boxscore?.teams||[];
+  const statsMarkup=teamStats.length?`<div class="panel"><h2>Team statistics</h2>${teamStats.map(t=>`<h3>${escapeHTML(t.team?.displayName||'Team')}</h3><div class="tablewrap"><table><tbody>${(t.statistics||[]).map(x=>`<tr><td>${escapeHTML(x.label||x.name||'')}</td><td class="num">${escapeHTML(statValue(x.displayValue))}</td></tr>`).join('')}</tbody></table></div>`).join('')}</div>`:'';
+  target.innerHTML=`<button id="scores-close">← Back to games</button><div class="panel"><h2>${escapeHTML(data.header?.competitions?.[0]?.status?.type?.detail||'Game box score')}</h2>${header}</div>${players.length?players.map(boxScoreTable).join(''):'<div class="panel"><p>Player statistics are not available yet. They usually appear during or after a game.</p></div>'}${statsMarkup}`;
+  document.getElementById('scores-close').onclick=()=>{target.classList.add('hide');document.getElementById('scores-games').scrollIntoView({behavior:'smooth'})};
+ }catch(err){target.innerHTML=`<div class="panel"><button id="scores-close">← Back</button><p>Box score unavailable: ${escapeHTML(err.message)}</p></div>`;document.getElementById('scores-close').onclick=()=>target.classList.add('hide')}
+}
+document.getElementById('nav-scores').onclick=()=>page('scores');
+document.getElementById('scores-refresh').onclick=loadScores;
+document.getElementById('scores-today').onclick=()=>{scoresDateEl.value=localDateISO();loadScores()};
+scoresDateEl.onchange=loadScores;
+
+</script></body></html>
